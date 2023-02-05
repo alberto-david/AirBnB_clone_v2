@@ -1,1 +1,1 @@
-{"State.None": {"name": "Arizona", "updated_at": "2022-10-16T13:55:40.731458", "__class__": "State"}, "City.None": {"state_id": null, "name": "Page", "updated_at": "2022-10-16T13:55:40.750846", "__class__": "City"}}
+{"User.93b06281-bd44-4015-bbe8-1fa0c298c691": {"id": "93b06281-bd44-4015-bbe8-1fa0c298c691", "created_at": "2018-06-14T09:45:52.369371", "updated_at": "2018-06-14T09:47:36.040444", "hello": "world", "__class__": "User"}}

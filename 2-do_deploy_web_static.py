@@ -1,35 +1,49 @@
 #!/usr/bin/python3
-#  Fabric script that generates a .tgz archive from the
-# contents of the web_static folder of your AirBnB Clone repo
-# using the function do_pack
-import os
-from fabric.api import run, put, env
+from fabric.api import *
+from os.path import exists
+from datetime import datetime
+from fabric.api import local
 
-env.hosts = ['44.192.38.3', '3.239.82.120']
-env.user = "ubuntu"
+env.hosts = ['35.237.103.2', '35.227.27.195']
+
+
+def do_pack():
+    '''
+    Fabric script that generates a .tgz archive from the
+    contents of the web_static
+    '''
+    try:
+        filepath = 'versions/web_static_' + datetime.now().\
+                   strftime('%Y%m%d%H%M%S') + '.tgz'
+        local('mkdir -p versions')
+        local('tar -zcvf versions/web_static_$(date +%Y%m%d%H%M%S).tgz\
+        web_static')
+        print('web_static packed: {} -> {}'.
+              format(filepath, os.path.getsize(filepath)))
+    except:
+        return None
 
 
 def do_deploy(archive_path):
-    """Create a tar gzipped archive of the directory web_static."""
-    if os.path.exists(archive_path) is False:
-        return False
-    else:
+        """
+        Depploy to yoru webs server
+    """
+        if exists(archive_path) is False:
+            return False
+        file_name = archive_path.split('/')[1]
+        file_path = '/data/web_static/releases'
         try:
-            put(archive_path, "/tmp/")
-            """ putting the file to .tgz """
-            file_name = archive_path.split("/")[1]
-            """ splitting .tgz """
-            file_name2 = file_name.split(".")[0]
-            """ spliting archivo """
-            final_name = "/data/web_static/releases/" + file_name2 + "/"
-            run("mkdir -p " + final_name)
-            run("tar -xzf /tmp/" + file_name + " -C " + final_name)
-            run("rm /tmp/" + file_name)
-            run("mv " + final_name + "web_static/* " + final_name)
-            run("rm -rf " + final_name + "web_static")
-            run("rm -rf /data/web_static/current")
-            run("ln -s " + final_name + " /data/web_static/current")
-            print("New version deployed!")
+            put(archive_path, '/tmp/')
+            run('mkdir -p {}{}'.format(file_path, file_name[:-4]))
+            run('tar -xzf /tmp/{} -C {}{}/'.format(file_name,
+                                                   file_path, file_name[:-4]))
+            run('rm /tmp/{}'.format(file_name))
+            run('mv {}{}/web_static/* {}{}/'.format(file_path, file_name[:-4],
+                                                    file_path, file_name[:-4]))
+            run('rm -rf {}{}/web_static'.format(file_path, file_name[:-4]))
+            run('rm -rf /data/web_static/current')
+            run('ln -s {}{}/ /data/web_static/current'.format(file_path,
+                                                              file_name[:-4]))
             return True
-        except Exception:
+        except:
             return False
